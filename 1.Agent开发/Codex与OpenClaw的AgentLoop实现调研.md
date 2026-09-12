@@ -6,7 +6,7 @@
 
 ## 1. 先给结论
 
-### 1.1 对“点小数”分层的判断
+### 1.1 对“某 Agent 项目”分层的判断
 
 “一次问答对应一个 `executionContext`，外循环负责容错，内循环负责思考与工具调用”是合理且适合当前项目的定义。需要补充两点：
 
@@ -92,7 +92,7 @@ Codex 和 OpenClaw 的通用提问 Tool 都采用“当前 Tool 调用阻塞等�
 
 ### 3.1 它是一次 Run 的工作上下文
 
-“点小数”的 `executionContext` 可以直接沿用，但建议定义为一次 Run 的上下文，而不是跨所有会话长期存在的大对象。它可以包含：
+“某 Agent 项目”的 `executionContext` 可以直接沿用，但建议定义为一次 Run 的上下文，而不是跨所有会话长期存在的大对象。它可以包含：
 
 ```text
 ExecutionContext
@@ -268,7 +268,7 @@ UI 返回答案后，handler 找到 pending sender 并回填，原 Tool 才返�
 - 第 113 至 115 行注释明确：Admission 只在 retry loop 之前解析一次，之后把同一个 admitted context 传给各个 attempt/recovery owner。
 - 第 314 行才进入 `while (true)` 容错循环。
 
-这与“点小数”的边界一致：用户身份、Session、工作区、模型配置、队列、Hook、运行控制器和上下文引擎等先形成执行上下文，然后 Attempt Loop 才开始。
+这与“某 Agent 项目”的边界一致：用户身份、Session、工作区、模型配置、队列、Hook、运行控制器和上下文引擎等先形成执行上下文，然后 Attempt Loop 才开始。
 
 ### 5.3 OpenClaw 的 Attempt/Recovery 外循环
 
@@ -416,7 +416,7 @@ OpenClaw 比简单的“把前半段消息总结一下”多做了三件很重�
 
 ## 6. 三种设计的对照
 
-| 维度 | 点小数思路 | Codex | OpenClaw | 当前项目建议 |
+| 维度 | 某 Agent 项目思路 | Codex | OpenClaw | 当前项目建议 |
 | --- | --- | --- | --- | --- |
 | 单次执行上下文 | `executionContext` 包含本次问答信息 | `Session` + `TurnContext` + Step context | `PreparedEmbeddedRunInput` + runtime/attempt context | 明确定义 `AgentExecutionContext`，生命周期为 Run |
 | Runtime 外围 | 用户认为不属于外循环 | Session/Task 层负责 | Gateway、queue、runtime preparation 负责 | 接受该边界，单独命名 Runtime |
@@ -647,7 +647,7 @@ Runtime
   -> Persistence / Events / Finalization
 ```
 
-“点小数”的 `executionContext + 容错外循环 + Tool 内循环` 可以作为主骨架，而且与 OpenClaw 的 embedded runner 分层非常接近。短期记忆则应定义为：
+“某 Agent 项目”的 `executionContext + 容错外循环 + Tool 内循环` 可以作为主骨架，而且与 OpenClaw 的 embedded runner 分层非常接近。短期记忆则应定义为：
 
 ```text
 Canonical Transcript
@@ -664,4 +664,4 @@ Canonical Transcript
 - Codex 与 OpenClaw 源码来自本机 ZIP 解压目录，目录中没有 `.git`，因此无法记录准确 commit hash。后续若用于长期架构决策，建议补充仓库 commit 或 release tag。
 - OpenClaw 结论同时参考其仓库内 `docs/concepts` 文档和源码。
 - 本次尝试访问 OpenAI 官方 Codex/Agents 在线文档时遇到 403/Cloudflare 限制，因此 Codex 结论以本机开源源码为准，没有把无法访问的网页内容当作证据。
-- 本报告是架构调研，不代表已经确认当前项目的最终实现方案；应与“点小数”参考 Prompt 对照后再定稿。
+- 本报告是架构调研，不代表已经确认当前项目的最终实现方案；应与“某 Agent 项目”参考 Prompt 对照后再定稿。
